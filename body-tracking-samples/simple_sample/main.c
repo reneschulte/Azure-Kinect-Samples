@@ -23,8 +23,9 @@ void print_body_information(k4abt_body_t body)
     {
         k4a_float3_t position = body.skeleton.joints[i].position;
         k4a_quaternion_t orientation = body.skeleton.joints[i].orientation;
-        printf("Joint[%d]: Position[mm] ( %f, %f, %f ); Orientation ( %f, %f, %f, %f) \n",
-            i, position.v[0], position.v[1], position.v[2], orientation.v[0], orientation.v[1], orientation.v[2], orientation.v[3]);
+        k4abt_joint_confidence_level_t confidence_level = body.skeleton.joints[i].confidence_level;
+        printf("Joint[%d]: Position[mm] ( %f, %f, %f ); Orientation ( %f, %f, %f, %f); Confidence Level (%d) \n",
+            i, position.v[0], position.v[1], position.v[2], orientation.v[0], orientation.v[1], orientation.v[2], orientation.v[3], confidence_level);
     }
 }
 
@@ -64,7 +65,8 @@ int main()
         "Get depth camera calibration failed!");
 
     k4abt_tracker_t tracker = NULL;
-    VERIFY(k4abt_tracker_create(&sensor_calibration, &tracker), "Body tracker initialization failed!");
+    k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
+    VERIFY(k4abt_tracker_create(&sensor_calibration, tracker_config, &tracker), "Body tracker initialization failed!");
 
     int frame_count = 0;
     do
@@ -96,10 +98,10 @@ int main()
             k4a_wait_result_t pop_frame_result = k4abt_tracker_pop_result(tracker, &body_frame, K4A_WAIT_INFINITE);
             if (pop_frame_result == K4A_WAIT_RESULT_SUCCEEDED)
             {
-                size_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
-                printf("%zu bodies are detected!\n", num_bodies);
+                uint32_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
+                printf("%u bodies are detected!\n", num_bodies);
 
-                for (size_t i = 0; i < num_bodies; i++)
+                for (uint32_t i = 0; i < num_bodies; i++)
                 {
                     k4abt_body_t body;
                     VERIFY(k4abt_frame_get_body_skeleton(body_frame, i, &body.skeleton), "Get body from body frame failed!");

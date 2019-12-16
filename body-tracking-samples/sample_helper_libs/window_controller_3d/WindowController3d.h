@@ -44,8 +44,8 @@ namespace Visualization
         void Create(
             const char *name,
             bool showWindow = true,
-            int width = 640,
-            int height = 576,
+            int width = -1,
+            int height = -1,
             bool fullscreen = false);
 
         void Delete();
@@ -87,7 +87,7 @@ namespace Visualization
 
         void SetLayout3d(Layout3d layout3d);
 
-        void ChangePointCloudSize(std::optional<float> pointCloudSize);
+        void ChangePointCloudSize(float pointCloudSize);
 
         void SetFloorRendering(bool enableFloorRendering, linmath::vec3 floorPosition, linmath::quaternion floorOrientation);
 
@@ -136,8 +136,12 @@ namespace Visualization
         float m_deltaTime = 0.f;
 
         // Window information
-        int m_windowWidth = 640;
-        int m_windowHeight = 576;
+        int m_windowWidth;
+        int m_windowHeight;
+        int m_windowStartPositionX;  // the upper-left corner of the window position
+        int m_windowStartPositionY;  // the upper-left corner of the window position
+        float m_defaultWindowWidthRatio = 0.6f;  // Default window width ratio relative to the full display screen
+        float m_defaultWindowHeightRatio = 0.6f;  // Default window height ratio relative to the full display screen
 
         // OpenGL resources
         GLFWwindow* m_window = nullptr;

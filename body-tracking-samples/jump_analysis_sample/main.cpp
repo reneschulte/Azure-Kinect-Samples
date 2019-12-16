@@ -78,7 +78,8 @@ int main()
 
     // Create Body Tracker
     k4abt_tracker_t tracker = nullptr;
-    VERIFY(k4abt_tracker_create(&sensorCalibration, &tracker), "Body tracker initialization failed!");
+    k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
+    VERIFY(k4abt_tracker_create(&sensorCalibration, tracker_config, &tracker), "Body tracker initialization failed!");
 
     // Initialize the 3d window controller
     Window3dWrapper window3d;
@@ -138,7 +139,7 @@ int main()
                 VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, JumpEvaluationBodyIndex, &body.skeleton), "Get skeleton from body frame failed!");
                 body.id = k4abt_frame_get_body_id(bodyFrame, JumpEvaluationBodyIndex);
 
-                uint64_t timestampUsec = k4abt_frame_get_timestamp_usec(bodyFrame);
+                uint64_t timestampUsec = k4abt_frame_get_device_timestamp_usec(bodyFrame);
                 jumpEvaluator.UpdateData(body, timestampUsec);
             }
 #pragma endregion
@@ -149,8 +150,8 @@ int main()
 
             // Visualize the skeleton data
             window3d.CleanJointsAndBones();
-            size_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
-            for (size_t i = 0; i < numBodies; i++)
+            uint32_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
+            for (uint32_t i = 0; i < numBodies; i++)
             {
                 k4abt_body_t body;
                 VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, i, &body.skeleton), "Get skeleton from body frame failed!");
